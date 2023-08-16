@@ -8,7 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+   
+  
     <link rel="stylesheet" href="/vue-project/src/assets/main.css">
     <title>BudgetWise</title>
     <style>
@@ -58,10 +59,27 @@
             <i class="fa-solid fa-share-nodes"></i>
             &nbsp; &nbsp; &nbsp; &nbsp;
             <i class="fa-solid fa-ellipsis-vertical"></i>
-            <button class="addbutton">
-              <svg data-v-d8f7786c="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 73" fill="none"><circle data-v-d8f7786c="" cx="28" cy="37" r="28" fill="#6970C9"></circle><path data-v-d8f7786c="" d="M25.3539 47.75V25.25H30.7039V47.75H25.3539ZM16.5039 39V34H39.5539V39H16.5039Z" fill="white"></path></svg>
-              </button>
+
+          <a class="addbutton" href="#popup1">
+              <svg data-v-d8f7786c="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 73" fill="none">
+                <circle data-v-d8f7786c="" cx="28" cy="37" r="28" fill="#6970C9"></circle>
+                <path data-v-d8f7786c="" d="M25.3539 47.75V25.25H30.7039V47.75H25.3539ZM16.5039 39V34H39.5539V39H16.5039Z" fill="white"></path>
+              </svg>
+            </a>
           </div>
+
+          <div id="popup1" class="overlay">
+            <div class="popup">
+              <a class="close" href="#">&times;</a>
+              <input v-model="budgetTitle.label" placeholder="Category Label">
+              <input v-model="budgetTitle.spent" placeholder="Spent">
+              <input v-model="budgetTitle.total" placeholder="Total">
+              <button @click="budgetAdd">Add</button>
+
+            </div>
+          </div>
+
+            
           
           <div class="month">
             April 2022 <i class="fa-solid fa-angle-down"></i> 
@@ -73,7 +91,8 @@
 
           <div class="category-scrollview">
             <div class="category-card" v-for="item in budgetTitle" style="cursor: pointer;"><div class="minimal-info">
-            <div class="left">
+              
+              <div class="left">
               <div class="icon">
               <div style="position: relative; display: flex; justify-content: center; align-items: center; flex-direction: column;">
               <div style="position: relative; display: flex; justify-content: center; align-items: center;">
@@ -111,16 +130,14 @@
            </div>
        </div>
 
-
-
-        
-
-<script src="https://unpkg.com/vue@next"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.30/vue.global.min.js"></script>
   <script>
-    let app = Vue.createApp({
+    const { createApp, ref, computed } = Vue;
+    const app = createApp({
       data : function(){
         return{
-
+          label: '',
+          spent: '',
           budgetTitle:[
         { label: "Education", hex: 'rgb(83, 213, 228)', image: 'fa-solid fa-graduation-cap', spent: '40', total: '100'},
         { label: "Entertaiment", hex: 'rgb(240, 151, 18)', image: 'fa-solid fa-ticket', spent: '10', total: '50'},
@@ -137,10 +154,43 @@
         { label: "Travel", hex: 'rgb(123, 95, 170)',image:'fa-solid fa-plane', spent: '50', total: '100' },
         { label: "Utilities", hex: 'rgb(89, 148, 224)',image:'fa-solid fa-lightbulb', spent: '160', total: '300' },
       ],
-          
-        }
-      }
-    })
+        };
+      },
+      methods: {
+        budgetAdd() {
+       
+      // Bonus 
+      /*this.budgetTitle.push({
+        label: this.budgetTitle.label,
+        hex: 'rgb(8, 143, 143)',
+        image: 'fa-solid fa-gas-pump', 
+        spent: this.budgetTitle.spent,
+        total: this.budgetTitle.total
+      });*/
+      const newBudgetData = {
+        label: this.budgetTitle.label,
+        hex: 'rgb(8, 143, 143)',
+        image: 'fa-solid fa-gas-pump', 
+        spent: this.budgetTitle.spent,
+        total: this.budgetTitle.total
+      };
+      this.budgetTitle.push(newBudgetData);
+      localStorage.setItem('budgetCategories', JSON.stringify(this.budgetTitle));
+
+      this.budgetTitle.label = "";
+      this.budgetTitle.spent = "";
+      this.budgetTitle.total = "";
+    }
+  }, 
+  
+  created() {
+    // Load existing categories from localStorage on component creation
+    const savedCategories = localStorage.getItem('budgetCategories');
+    if (savedCategories) {
+      this.budgetTitle = JSON.parse(savedCategories);
+    }
+  }
+      })
     app.mount('#app')
   </script>  
 
