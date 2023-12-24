@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+   
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+   
+  
+    <link rel="stylesheet" href="/Users/dishashetty/Desktop/Vuejs/BudgetWise.io/vue-project/src/assets/main.css">
+    <title>BudgetWise</title>
+    <style>
+
+      [v-cloak]{
+        display: none;
+      }
+
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+
+    
+  </head>
+  <body>
+    <div id="app" v-cloak>
+
+      <div class = "navbar">
+        <div class = "budgetwise-logo">
+          
+          <img :src="logoImage" style= "width:30px; height:30px;" alt="user-img">
+            <span> BudgetWise </span>
+        </div>
+        <ul class="nav">
+          <a href="#" class="home">Home</a>
+          <a href="#" class="community">Community</a>
+          <a href="#" class="faqs">FAQs</a>
+        </ul>
+        <button class="account">
+          <img :src="userImage" style= "width:30px; height:30px;" alt="user-img">
+          <span class="user-name">John Doe</span>
+          <i class="fa-solid fa-angle-down"></i>  
+        </button>
+      </div>
+
+      <div class="body">
+        <div class="left-sidebar">
+          <ul class= "sidebar">
+            <li><a  href="#" class="overview" @click="toggleOverview">Overview</a></li>
+            <li><a  href="#" class="budget">Budget</a></li>
+            <li><a  href="#" class="transactions">Transactions</a></li>
+            <li><a  href="#" class="trends">Trends</a></li>
+            <li><a  href="#" class="savings">Savings Goals</a></li>
+            <li><a  href="#" class="alerts">Alerts</a></li>
+          </ul>
+        </div>
+
+        
+      
+        <div id="main-panel">
+          <div class="situational-budget">
+            Monthly Budget <i class="fa-solid fa-angle-down" style="padding: 9px;"></i>
+           
+            <i class="fa-solid fa-share-nodes"></i>
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+            &nbsp; &nbsp;
+          <a class="addbutton" href="#popup1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 73" fill="none">
+                <circle cx="28" cy="37" r="28" fill="#6970C9"></circle>
+                <path d="M25.3539 47.75V25.25H30.7039V47.75H25.3539ZM16.5039 39V34H39.5539V39H16.5039Z" fill="white"></path>
+              </svg>
+          </a>
+          </div>
+
+          <div id="popup1" class="overlay">
+            <div class="popup">
+              <input v-model="budgetTitle.label" placeholder="Category Label">&nbsp;
+              <input v-model="budgetTitle.spent" placeholder="Spent">
+              <input v-model="budgetTitle.total" placeholder="Total"><br>
+              <button @click="budgetAdd">Add</button>&nbsp;
+              <button @click="budgetRemove">Delete</button>
+            </div>
+          </div>
+
+ 
+          
+        <select v-model="selectedMonth" class= month>
+        <option value="" disabled selected>Month</option>
+        <option v-for="month in months" :value="month">{{ month }}
+        </option>
+        </select>
+              
+  
+          <h2 class="category">
+            Categories
+          </h2>
+
+          <div class="category-scrollview" v-if="selectedMonth === 'April 2023'" >
+            <div class="category-card" v-for="item in budgetTitle" style="cursor: pointer;">
+              <div class="minimal-info" >
+              
+              <div class="left">
+              <div class="icon">
+              <div style="position: relative; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+              <div style="position: relative; display: flex; justify-content: center; align-items: center;">
+                <div id="middle-circle">
+                  <i :class="item.image" style="color:#fff"></i>
+                </div>
+                <div id="progress-spinner" :style="{'background-color': item.hex}">
+                </div>
+              </div>
+            </div>
+          </div>
+            <div class="info"><div id="title"><span>{{item.label}}</span></div>
+                <div class="additional"><span>Spent 
+                  <span class="amount" style="color: #53bd71">${{item.spent}}
+              </span> of ${{item.total}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <span id="amount">${{item.total - item.spent}}</span>
+          <span id="green">left</span>
+        </div>
+      </div>
+
+        <div class="transactions">
+        <br>
+          <div id="myProgress">
+            <div id="myBar" v-bind:style="{ width : ((item.spent/item.total)*100) + '%', backgroundColor: item.hex}"></div>
+          </div>
+       </div>
+      </div>
+    </div>
+  
+    </div>
+
+    <div id="rhs"  >
+    <div class="active-budget-card">
+      <div class="stats">
+        <div class="total"> Spent 
+          <div id="budget-amount" style="color:rgb(229, 16, 16); font-size: 25px">$800</div>
+        </div>
+        <div class="divider"></div>
+        <div class="middle"> Available 
+          <div id="budget-amount" style="color:#31cd3e; font-size: 25px">$1200</div>
+        </div>
+        <div class="divider"></div>
+        <div class="right1"> Budget 
+          <div id="budget-amount" style="color:rgb(2, 8, 3); font-size: 25px">$2000</div>
+        </div>
+      </div>
+      <div class="box-progress-bar">
+        <span class="box-progress" style="width: 40%"></span>
+      </div>
+    </div>
+
+    <br> 
+    <div class = "recent"> 6 Month Snapshot </div>
+    <br>
+    <div class="graph"> 
+      <canvas id="myChart" style="height:400px;"></canvas>
+    </div>
+    
+    <br>
+    <div class="recent">
+      <div class="recent-transactions">Recent Transactions</div>
+      <div class="see-all">See all</div>
+      <br><br>
+    </div>
+    <div class="view">
+    <div class="purchased-card" v-for="list in purchasedList" style="cursor: pointer;">
+          <div class="minimal-info">
+            <div class="left">
+              <div class="icon">
+                <div style="position: relative;display: flex;justify-content: center;align-items: center;flex-direction: column;">
+                  <div style="position: relative; display: flex; justify-content: center; align-items: center;">
+                    <div id="middle-circle1">
+                    <img :src="list.image">
+                      
+                    </div>
+                    <div id="progress-spinner" :style="{'background-color': list.hex}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="info">
+                <div id="title">
+                  <span>{{list.label}}</span>
+                </div>
+                <div class="additional">
+                  {{list.sublabel}}
+                </div>
+              </div>
+            </div>
+            <div class="right" style= "white-space: nowrap;">
+              <span id="amount" style="color: rgb(3, 6, 8);">${{list.cost}}</span>
+              <span id="date">{{list.date}}</span>
+            </div>
+            <div class="right2">
+            <i class="fa-solid fa-angle-right" style= "margin-right: -20px;"></i>
+          </div>
+          </div>
+          
+        </div></div>
+
+        
+        <br>
+        <div class="recent"> Bank & Credit Cards </div>
+        <br>
+        <div class="purchased-card" style="cursor: pointer;">
+          <div class="minimal-info">
+            <div class="left">
+              <div class="icon">
+                <div style="position: relative; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                  <div style="position: relative; display: flex; justify-content: center; align-items: center;">
+                    
+                      <img :src="bankImage" id= "bank" alt="BOA"/>
+                    </div>
+                  </div>
+              </div>
+              <div class="info">
+                <div id="title">
+                  <span>Bank of America</span>
+                </div>
+                <div class="additional">...4765</div>
+              </div>
+            </div>
+            <div class="right">
+              <span id="amount" style="color: #6970c9;">Balance</span>
+              <span id="date" style="color: #6970c9;">$1,326.23</span>
+             
+            </div>
+            <i class="fa-solid fa-angle-up" style= "margin-right: -20px;"></i>
+          </div>
+        </div>
+
+        <br>
+        <div class = "recent"> Savings Goals 
+          <div class="see-all"><span style="font-size: 3rem;">&#43;</span></div>
+        </div>
+       
+        <div class="graph1"> 
+          <div class="trip"> Italy Trip
+            <div class="see-all1" style="color: rgb(105, 112, 201); margin-left: 600px; margin-top: -30px; font-size: 1.2rem;">See details
+            </div>
+          </div>
+          <br>
+          
+         
+          <canvas id="myDoughnutChart"></canvas>
+          
+          <div id="additionalText" class="additional-text"></div>
+          <div id="additionalText1" class="additional-text1"></div>
+          </div>
+</div>
+</div>
+
+  
+     
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.30/vue.global.min.js"></script>
+
+<script type="module">
+  import logoImage from '@/assets/logo.png';
+  import userImage from '@/assets/John Doe.jpeg';
+  import bankImage from '@/assets/BOA.png';
+
+  //console.log(logoImage, userImage);
+
+
+ 
+    
+
+  const { createApp, ref, computed } = Vue;
+    const app = createApp({
+      data : function(){
+        return{
+          logoImage: logoImage,
+            userImage: userImage,
+            bankImage: bankImage,
+          chart: null,
+          showOverview: false,
+      selectedMonth: '',
+      months: ['January 2023', 'February 2023', 'March 2023', 'April 2023',
+    'June 2023', 'July 2023', 'August 2023', 'September 2023', 'October 2023', 
+    'November 2023', 'December 2023'],
+          budgetTitle:[
+        { label: "Education", hex: 'rgb(83, 213, 228)', image: 'fa-solid fa-graduation-cap', spent: '40', total: '100'},
+        { label: "Entertaiment", hex: 'rgb(240, 151, 18)', image: 'fa-solid fa-ticket', spent: '10', total: '50'},
+        { label: "Food", hex: 'rgb(17, 6, 135)', image: 'fa-solid fa-utensils',spent: '65', total: '150' },
+        { label: "Groceries", hex: 'rgb(52, 196, 62)', image: 'fa-solid fa-bag-shopping',spent: '100', total: '200' },
+        { label: "Healthcare", hex: 'rgb(153, 25, 178)', image: 'fa-solid fa-notes-medical',spent: '100', total: '100' },
+        { label: "Housing", hex: 'rgb(222, 12, 23)', image: 'fa-solid fa-house',spent: '1750', total: '1750' },
+        { label: "Miscellaneous", hex: 'rgb(160, 111, 74)', image: 'fa-brands fa-microsoft',spent: '0', total: '50' },
+        { label: "Office", hex: 'rgb(213, 18, 164)', image: 'fa-solid fa-briefcase',spent: '0', total: '20' },
+        { label: "Pets", hex: 'rgb(109, 46, 6)', image: 'fa-solid fa-dog',spent: '0', total: '20' },
+        { label: "Shopping", hex: 'rgb(28, 66, 192)', image:'fa-solid fa-cart-shopping',spent: '20', total: '100' },
+        { label: "Subscriptions", hex: 'rgb(51, 103, 143)',image:'fa-solid fa-tv',spent: '35', total: '50' },
+        { label: "Transportation", hex: 'rgb(230, 216, 70)',image:'fa-solid fa-car', spent: '30', total: '100' },
+        { label: "Travel", hex: 'rgb(123, 95, 170)',image:'fa-solid fa-plane', spent: '50', total: '100' },
+        { label: "Utilities", hex: 'rgb(89, 148, 224)',image:'fa-solid fa-lightbulb', spent: '160', total: '300' },
+      ],
+
+      purchasedList:[
+      { label: "Cold Brew", hex: 'rgb(8, 29, 149)', image: 'https://budgetwise.co/img/gift.811ce353.svg', sublabel: 'Starbucks', cost: '5.92', date:'03-30-2022'},
+      { label: "Coursera", hex: 'rgb(83, 213, 228)', image: 'https://budgetwise.co/img/education.20df2648.svg', sublabel: 'Education', cost: '39.00', date:'03-12-2022'},
+      { label: "AppleTree", hex: 'rgb(52, 196, 62)', image: 'https://budgetwise.co/img/groceries.e667316a.svg', sublabel: 'Groceries', cost: '3.98', date:'03-03-2022'},
+      { label: "BKST-U-PENN", hex: 'rgb(32, 139, 215)', image: 'https://budgetwise.co/img/shopping.a541af7b.svg', sublabel: 'Shopping', cost: '49.89', date:'03-03-2022'},
+    ]
+      ,
+      options:{
+        animationEnabled: true,
+        title:{
+		  text: "Vue.js Basic Column Chart"
+        },
+        data: [{
+          type: "column",
+          dataPoints: [
+            { label: "apple",  y: 10 },
+            { label: "orange", y: 15 },
+            { label: "banana", y: 25 },
+            { label: "mango",  y: 30 },
+            { label: "grape",  y: 28 }
+          ]
+        }]
+      }
+        };
+      },
+      methods: {
+        toggleOverview() {
+        this.showOverview = !this.showOverview;
+      },
+      budgetRemove(){
+        document.getElementById('popup1').style.display = 'none';
+      },
+        budgetAdd() {
+       
+      // Bonus 
+      /*this.budgetTitle.push({
+        label: this.budgetTitle.label,
+        hex: 'rgb(8, 143, 143)',
+        image: 'fa-solid fa-gas-pump', 
+        spent: this.budgetTitle.spent,
+        total: this.budgetTitle.total
+      });*/
+ 
+      const newBudgetData = {
+        label: this.budgetTitle.label,
+        hex: 'rgb(8, 143, 143)',
+        image: 'fa-solid fa-gas-pump', 
+        spent: this.budgetTitle.spent,
+        total: this.budgetTitle.total
+      };
+      this.budgetTitle.push(newBudgetData);
+      localStorage.setItem('budgetCategories', JSON.stringify(this.budgetTitle));
+
+      this.budgetTitle.label = "";
+      this.budgetTitle.spent = "";
+      this.budgetTitle.total = "";
+    },
+
+  }, 
+  
+  
+  created() {
+    const savedCategories = localStorage.getItem('budgetCategories');
+    if (savedCategories) {
+      this.budgetTitle = JSON.parse(savedCategories);
+    }
+  },
+})
+    //Chart.js
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+    var ctx = document.getElementById("myChart").getContext("2d");
+    var ctxDoughnut = document.getElementById("myDoughnutChart").getContext("2d");
+    ctx.height = 400;
+    //canvas.style.height = 'none';
+    var myChart = new Chart(ctx, {
+  type: "bar",
+  data: {
+    labels: ["Mar", "Apr", "May", "June", "July", "Aug"],
+    datasets: [
+      {
+        label: "Utilities",
+        data: [450, 500, 620, 800, 690, 500],
+        backgroundColor: "rgba(34, 167, 240)",
+        borderColor: "rgba(34, 167, 240)",
+        borderWidth: 1,
+        barPercentage: 0.7,
+      },
+      {
+        label: "Housing",
+        data: [300, 250, 400, 400, 350, 250],
+        backgroundColor: "rgba(242, 38, 19)",
+        borderColor: "rgba(242, 38, 19)",
+        borderWidth: 1,
+        barPercentage: 0.7,
+      },
+      {
+        label: "Entertainment",
+        data: [200, 150, 400, 450, 350, 150],
+        backgroundColor: "rgba(249, 105, 14)",
+        borderColor: "rgba(249, 105, 14)",
+        borderWidth: 1,
+        barPercentage: 0.7,
+      },
+      {
+        label: "Transportation",
+        data: [350, 120, 300, 300, 350, 190],
+        backgroundColor: "rgba(249, 191, 59)",
+        borderColor: "rgba(249, 191, 59)",
+        borderWidth: 1,
+        barPercentage: 0.7,
+      },
+      {
+        label: "Food",
+        data: [100, 100, 100, 150, 150, 100],
+        backgroundColor: "rgba(1,1,122)",
+        borderColor: "rgba(1,1,122)",
+        borderWidth: 1,
+        barPercentage: 0.7,
+      },
+      {
+        label: "Other",
+        data: [400, 200, 350, 350, 350, 100],
+        backgroundColor: "rgba(102, 51, 153)",
+        borderColor: "rgba(102, 51, 153)",
+        borderWidth: 1,
+        barPercentage: 0.7,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        stacked: true,
+        grid: {
+          display: false,
+        },
+      },
+      y: {
+        stacked: true,
+        grid: {
+          display: false,
+        },
+        ticks: {
+          callback: function (value, index, values) {
+            if (value >= 1500) {
+              return (value / 1000).toFixed(1) + "k";
+            }
+            return value;
+          },
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        display: true,
+        position: "bottom",
+        labels: {
+          fontColor: "#333",
+          usePointStyle: true,
+          borderRadius: 1,
+          boxWidth: 30,
+        },
+        align: "center",
+        maxItems: 3,
+      },
+      annotation: {
+        annotations: [
+          {
+            type: "line",
+            mode: "horizontal",
+            scaleID: "y",
+            value: 1500,
+            borderColor: "black",
+            borderWidth: 0.5,
+            label: {
+              content: "1.5k",
+              enabled: true,
+              position: "end", // Adjust the position as needed
+            },
+          },
+          {
+            type: "line",
+            mode: "horizontal",
+            scaleID: "y",
+            value: 2000,
+            borderColor: "rgba(255, 0, 0, 0.5)",
+            borderWidth: 1,
+            borderDash: [3, 3], // Make the line dashed
+            label: {
+              //content: "2k",
+              position: "right",
+              enabled: true,
+            },
+          },
+          {
+            type: "line",
+            mode: "horizontal",
+            scaleID: "y",
+            value: 2500,
+            borderColor: "rgba(255, 0, 0, 0.5)",
+            borderWidth: 1,
+            borderDash: [3, 3], // Make the line dashed
+            label: {
+              position: "right",
+              enabled: true,
+            },
+            },
+          
+        ],
+      },
+    },
+  },
+});
+    //Donut Graph
+
+  var myDoughnutChart = new Chart(ctxDoughnut, {
+  type: "doughnut",
+  data: {
+    labels: ["Expenses", "Savings"],
+    datasets: [
+      {
+        data: [300, 300],
+        backgroundColor: ["#31cd3e", "#d5d5d5"],
+      },
+    ],
+  },
+  options: {
+    responsive: false,
+    maintainAspectRatio: false,
+    cutout: 90,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+    },
+    // Use the afterDraw callback to add text
+    animation: {
+      onComplete: function (context) {
+        var chartInstance = context.chart;
+        var ctx = chartInstance.ctx;
+
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        var centerX = (chartInstance.chartArea.left + chartInstance.chartArea.right) / 2;
+        var centerY = (chartInstance.chartArea.top + chartInstance.chartArea.bottom) / 2;
+
+        var rightX = chartInstance.chartArea.right;
+        var rightY = centerY;
+        
+        ctx.fillStyle = "#008000";
+        ctx.font = "bold 40px 'Outfit'";
+        ctx.fillText("$300", centerX, centerY - 8);
+
+        ctx.fillStyle = "#000"; 
+        ctx.font = "20px 'Outfit'"; 
+        ctx.fillText("of 600 saved", centerX, centerY + 20);
+        ctx.fillText("this month", centerX, centerY + 40);    
+  },
+    },
+  },
+});
+  ctxDoughnut.canvas.width = 500; 
+  ctxDoughnut.canvas.height = 500;
+  var additionalText = "Total Savings: $300 of $3,000";
+  var additionalText1 = "by April 15, 2023"
+    var additionalTextElement = document.getElementById("additionalText");
+    var additionalTextElement1 = document.getElementById("additionalText1");
+    additionalTextElement.textContent = additionalText;
+    additionalTextElement1.textContent = additionalText1;
+
+  
+  });
+     
+    app.mount('#app')
+   
+  </script> 
+  </script>
+ 
+
+</body>
+</html>
