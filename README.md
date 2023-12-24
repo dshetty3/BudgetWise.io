@@ -2,4 +2,4 @@
 
 
 
-<img src="./BudgetWise.gif" alt="Demo GIF" width="900"/>
+<img src="./Budgetwise.gif" alt="Demo GIF" width="900"/>
